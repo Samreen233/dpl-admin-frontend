@@ -8,6 +8,7 @@ import {
 
 // Context Providers
 import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 // Components
 import Layout from "./components/Layout";
@@ -21,7 +22,9 @@ import Products from "./pages/Products";
 import Users from "./pages/Users";
 import Admins from "./pages/Admins";
 import UpdatePrice from "./pages/UpdatePrice";
-import { ThemeProvider } from "./context/ThemeContext";
+import DailyPrices from "./pages/DailyPrices";
+import PriceGraph from "./pages/PriceGraph";
+import EditRights from "./pages/EditRights"; // Import the new page
 
 function App() {
   return (
@@ -30,12 +33,10 @@ function App() {
         <Router>
           <Routes>
             {/* --- Public Routes --- */}
-            {/* Root page is Login as requested */}
             <Route path="/" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
             {/* --- Protected Admin Routes --- */}
-            {/* These are wrapped in ProtectedRoute and Layout */}
             <Route
               path="/dashboard"
               element={
@@ -80,12 +81,52 @@ function App() {
               }
             />
 
+            {/* Route for editing rights of a specific admin via ID */}
+            <Route
+              path="/admins/edit-rights/:id"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <EditRights />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Optional: Route for the Sidebar 'Permissions' link (defaults to admin list or specific view) */}
+            <Route
+              path="/admins/edit-rights"
+              element={<Navigate to="/admins" replace />}
+            />
+
             <Route
               path="/update-price"
               element={
                 <ProtectedRoute>
                   <Layout>
                     <UpdatePrice />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/daily-prices"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <DailyPrices />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/price-graph"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <PriceGraph />
                   </Layout>
                 </ProtectedRoute>
               }
