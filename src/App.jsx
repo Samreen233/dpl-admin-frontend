@@ -7,8 +7,8 @@ import {
 } from "react-router-dom";
 
 // Context Providers
-import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 // Components
 import Layout from "./components/Layout";
@@ -27,41 +27,56 @@ import DailyPrices from "./pages/DailyPrices";
 import PriceGraph from "./pages/PriceGraph";
 import EditRights from "./pages/EditRights";
 
+// Helper component to redirect logged-in users away from Auth pages (Login/Register)
+const PublicRoute = ({ children }) => {
+  const { user } = useAuth();
+  return user ? <Navigate to="/dashboard" replace /> : children;
+};
+
 function App() {
   return (
     <ThemeProvider>
       <Router>
         <Routes>
-          {/* Wrap everything inside AuthProvider */}
+          {/* Wrap everything inside AuthProvider as a layout route */}
           <Route element={<AuthProvider />}>
             
-            {/* -------- Public Routes -------- */}
-            <Route path="/" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            {/* -------- Public Routes (Redirect if already logged in) -------- */}
+            <Route
+              path="/"
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              }
+            />
             <Route path="/verify-otp" element={<VerifyOtp />} />
 
-            {/* -------- Protected Routes -------- */}
+            {/* -------- Protected Routes (Require Authentication) -------- */}
             <Route element={<ProtectedRoute />}>
+              {/* Layout provides Sidebar and Main container */}
               <Route element={<Layout />}>
-                
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/users" element={<Users />} />
                 <Route path="/admins" element={<Admins />} />
-                <Route
-                  path="/admins/edit-rights/:id"
-                  element={<EditRights />}
-                />
+                <Route path="/admins/edit-rights/:id" element={<EditRights />} />
                 <Route path="/update-price" element={<UpdatePrice />} />
                 <Route path="/daily-prices" element={<DailyPrices />} />
                 <Route path="/price-graph" element={<PriceGraph />} />
-
               </Route>
             </Route>
 
-            {/* Catch-all */}
+            {/* -------- Catch-all -------- */}
             <Route path="*" element={<Navigate to="/" replace />} />
-
           </Route>
         </Routes>
       </Router>
