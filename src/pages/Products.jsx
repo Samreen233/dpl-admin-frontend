@@ -41,10 +41,33 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [previousPrices, setPreviousPrices] = useState({});
 
   // UI State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+  // Load previous prices from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("product_previous_prices");
+      if (stored) {
+        setPreviousPrices(JSON.parse(stored));
+      }
+    } catch (err) {
+      console.error("Failed to load previous prices:", err);
+    }
+  }, []);
+
+  // Save previous price to localStorage
+  const savePreviousPrice = (productId, price) => {
+    setPreviousPrices((prev) => {
+      const updated = { ...prev, [productId]: price };
+      localStorage.setItem("product_previous_prices", JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const initialFormState = {
     name: "",
@@ -77,7 +100,8 @@ const Products = () => {
 
   const fetchCategories = async () => {
     try {
-      const categoriesUrl = import.meta.env.VITE_CATEGORIES_URL || "/categories";
+      const categoriesUrl =
+        import.meta.env.VITE_CATEGORIES_URL || "/categories";
       const res = await api.get(categoriesUrl);
       if (!Array.isArray(res.data)) return;
 
@@ -176,12 +200,10 @@ const Products = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this product?"))
-      return;
-
     try {
       await deleteProduct(id);
       await fetchProducts(); // Refresh product list
+      setDeleteConfirm(null);
     } catch (err) {
       console.error("Failed to delete product:", err);
       alert("Failed to delete product. Please try again.");
@@ -193,6 +215,20 @@ const Products = () => {
     setSubmitting(true);
 
     try {
+      // Get the current product to save its price as previous
+      const currentProduct = products.find(
+        (p) => p.product_id === editingProduct.product_id,
+      );
+      const currentPrice = currentProduct?.price;
+
+      // Save current price as previous price before updating
+      if (
+        currentPrice !== undefined &&
+        currentPrice !== Number(editingProduct.price)
+      ) {
+        savePreviousPrice(editingProduct.product_id, currentPrice);
+      }
+
       const productData = {
         name: (editingProduct.name || "").trim(),
         description: editingProduct.description || "",
@@ -202,9 +238,12 @@ const Products = () => {
             ? 0
             : Number(editingProduct.discount_percent),
         stock_qty:
-          editingProduct.stock_qty === "" ? 0 : Number(editingProduct.stock_qty),
+          editingProduct.stock_qty === ""
+            ? 0
+            : Number(editingProduct.stock_qty),
         category_id:
-          editingProduct.category_id === "" || editingProduct.category_id == null
+          editingProduct.category_id === "" ||
+          editingProduct.category_id == null
             ? null
             : Number(editingProduct.category_id),
       };
@@ -340,7 +379,7 @@ const Products = () => {
                         <Edit3 size={18} />
                       </button>
                       <button
-                        onClick={() => handleDelete(p.product_id)}
+                        onClick={() => setDeleteConfirm(p.product_id)}
                         className="p-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md rounded-xl text-red-500 shadow-lg hover:bg-red-500 hover:text-white transition-all"
                       >
                         <Trash2 size={18} />
@@ -364,7 +403,19 @@ const Products = () => {
 
                     <div className="mt-6 flex items-end justify-between border-t border-slate-50 dark:border-slate-800 pt-4">
                       <div>
-                        {p.discount_percent > 0 ? (
+                        {previousPrices[p.product_id] ? (
+                          <div className="flex flex-col">
+                            <span className="text-slate-400 line-through text-[10px] font-bold italic">
+                              Rs.{previousPrices[p.product_id]}
+                            </span>
+                            <span className="text-2xl font-black text-emerald-600 font-mono">
+                              Rs.{p.price}
+                              <span className="text-xs ml-1 opacity-60">
+                                /kg
+                              </span>
+                            </span>
+                          </div>
+                        ) : p.discount_percent > 0 ? (
                           <div className="flex flex-col">
                             <span className="text-slate-400 line-through text-[10px] font-bold italic">
                               Rs.{p.price}
@@ -592,6 +643,15 @@ const Products = () => {
                     className="w-full p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white font-mono"
                     placeholder="0.00"
                   />
+                  {editingProduct &&
+                    previousPrices[editingProduct.product_id] && (
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+                        <span className="font-bold">Previous price:</span>
+                        <span className="font-mono font-black text-emerald-600">
+                          Rs.{previousPrices[editingProduct.product_id]}
+                        </span>
+                      </p>
+                    )}
                 </div>
 
                 <div className="space-y-2">
@@ -710,9 +770,59 @@ const Products = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <Motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeleteConfirm(null)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+            />
+
+            <Motion.div
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              className="relative w-full max-w-md bg-white dark:bg-slate-900 p-8 rounded-[2rem] shadow-2xl"
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                  <Trash2 size={32} className="text-red-500" />
+                </div>
+
+                <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2">
+                  Delete Product?
+                </h3>
+                <p className="text-slate-500 font-medium mb-6">
+                  This action cannot be undone. The product will be permanently
+                  removed from your inventory.
+                </p>
+
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={() => setDeleteConfirm(null)}
+                    className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                  >
+                    CANCEL
+                  </button>
+                  <button
+                    onClick={() => handleDelete(deleteConfirm)}
+                    className="flex-1 py-4 bg-red-500 text-white font-black rounded-2xl hover:bg-red-600 transition-colors shadow-lg shadow-red-500/30"
+                  >
+                    DELETE
+                  </button>
+                </div>
+              </div>
+            </Motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
 export default Products;
-
