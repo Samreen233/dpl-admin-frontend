@@ -30,10 +30,16 @@ export const createProduct = async (productData, imageFile = null) => {
     "discount_percent",
     String(normalizeNumber(productData.discount_percent, 0)),
   );
-  formData.append("stock_qty", String(normalizeNumber(productData.stock_qty, 0)));
+  formData.append(
+    "stock_qty",
+    String(normalizeNumber(productData.stock_qty, 0)),
+  );
 
   if (productData.category_id !== null && productData.category_id !== "") {
-    formData.append("category_id", String(normalizeNumber(productData.category_id)));
+    formData.append(
+      "category_id",
+      String(normalizeNumber(productData.category_id)),
+    );
   }
 
   // Append image file if provided
@@ -48,35 +54,69 @@ export const createProduct = async (productData, imageFile = null) => {
 
 // Update a product (with optional image upload)
 export const updateProduct = async (id, productData, imageFile = null) => {
-  const formData = new FormData();
-
-  // Append text fields (only those that are provided)
-  if (productData.name !== undefined) formData.append("name", (productData.name || "").trim());
-  if (productData.description !== undefined) {
-    formData.append("description", productData.description);
-  }
-  if (productData.price !== undefined) {
-    formData.append("price", String(normalizeNumber(productData.price)));
-  }
-  if (productData.discount_percent !== undefined) {
-    formData.append(
-      "discount_percent",
-      String(normalizeNumber(productData.discount_percent, 0)),
-    );
-  }
-  if (productData.stock_qty !== undefined) {
-    formData.append("stock_qty", String(normalizeNumber(productData.stock_qty, 0)));
-  }
-  if (productData.category_id !== undefined && productData.category_id !== null && productData.category_id !== "") {
-    formData.append("category_id", String(normalizeNumber(productData.category_id)));
-  }
-
-  // Append image file if provided
+  // If there's an image file, use FormData
   if (imageFile) {
+    const formData = new FormData();
+
+    // Append text fields (only those that are provided)
+    if (productData.name !== undefined)
+      formData.append("name", (productData.name || "").trim());
+    if (productData.description !== undefined) {
+      formData.append("description", productData.description);
+    }
+    if (productData.price !== undefined) {
+      formData.append("price", String(normalizeNumber(productData.price)));
+    }
+    if (productData.discount_percent !== undefined) {
+      formData.append(
+        "discount_percent",
+        String(normalizeNumber(productData.discount_percent, 0)),
+      );
+    }
+    if (productData.stock_qty !== undefined) {
+      formData.append(
+        "stock_qty",
+        String(normalizeNumber(productData.stock_qty, 0)),
+      );
+    }
+    if (
+      productData.category_id !== undefined &&
+      productData.category_id !== null &&
+      productData.category_id !== ""
+    ) {
+      formData.append(
+        "category_id",
+        String(normalizeNumber(productData.category_id)),
+      );
+    }
+
     formData.append("image", imageFile);
+
+    const response = await api.put(`${PRODUCTS_URL}/${id}`, formData);
+    return response.data;
   }
 
-  const response = await api.put(`${PRODUCTS_URL}/${id}`, formData);
+  // If no image file, send as JSON (more reliable for partial updates)
+  const jsonData = {};
+  if (productData.name !== undefined)
+    jsonData.name = (productData.name || "").trim();
+  if (productData.description !== undefined)
+    jsonData.description = productData.description;
+  if (productData.price !== undefined)
+    jsonData.price = normalizeNumber(productData.price);
+  if (productData.discount_percent !== undefined)
+    jsonData.discount_percent = normalizeNumber(productData.discount_percent, 0);
+  if (productData.stock_qty !== undefined)
+    jsonData.stock_qty = normalizeNumber(productData.stock_qty, 0);
+  if (
+    productData.category_id !== undefined &&
+    productData.category_id !== null &&
+    productData.category_id !== ""
+  ) {
+    jsonData.category_id = normalizeNumber(productData.category_id);
+  }
+
+  const response = await api.put(`${PRODUCTS_URL}/${id}`, jsonData);
 
   return response.data;
 };
@@ -84,5 +124,14 @@ export const updateProduct = async (id, productData, imageFile = null) => {
 // Delete a product (soft delete)
 export const deleteProduct = async (id) => {
   const response = await api.delete(`${PRODUCTS_URL}/${id}`);
+  return response.data;
+};
+
+// Bulk update prices for multiple products
+export const updatePrices = async (priceUpdates) => {
+  // priceUpdates should be an array of: { id, price, rate_g1?, rate_g2? }
+  const response = await api.post(`${PRODUCTS_URL}/update-prices`, {
+    prices: priceUpdates,
+  });
   return response.data;
 };
