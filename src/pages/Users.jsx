@@ -39,7 +39,9 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       const res = await api.get("/users/");
-      setUsers(res.data);
+      // Filter only regular users (exclude admin and superadmin)
+      const regularUsers = res.data.filter((u) => u.role_name === "user");
+      setUsers(regularUsers);
     } catch (err) {
       setStatus((prev) => ({
         ...prev,
@@ -60,15 +62,27 @@ const Users = () => {
 
     try {
       if (editingUser) {
-        const res = await api.put(`/users/${editingUser.id}`, formData);
-        setUsers((prev) =>
-          prev.map((u) => (u.user_id === editingUser.id ? res.data : u)),
-        );
+        // Update user basic info
+        const { role, ...userData } = formData;
+        await api.put(`/users/${editingUser.user_id}`, userData);
+
+        // Update role separately if changed
+        if (role !== editingUser.role_name) {
+          await api.put(`/users/${editingUser.user_id}/role`, {
+            role_name: role,
+          });
+        }
+
+        // Refresh users list
+        await fetchUsers();
+        setIsModalOpen(false);
       } else {
+        // Create new user
         const res = await api.post("/users/", formData);
-        setUsers((prev) => [...prev, res.data]);
+        // Refresh users list to get the new user
+        await fetchUsers();
+        setIsModalOpen(false);
       }
-      setIsModalOpen(false);
     } catch (err) {
       setStatus((prev) => ({
         ...prev,
@@ -83,8 +97,10 @@ const Users = () => {
     if (!userToDelete) return;
     setStatus((prev) => ({ ...prev, loading: true }));
     try {
-      await api.delete(`/users/${userToDelete.id}`);
-      setUsers((prev) => prev.filter((u) => u.user_id !== userToDelete.id));
+      await api.delete(`/users/${userToDelete.user_id}`);
+      setUsers((prev) =>
+        prev.filter((u) => u.user_id !== userToDelete.user_id),
+      );
       setIsDeleteModalOpen(false);
     } catch (err) {
       alert(err.response?.data?.message || "Failed to delete user");
@@ -106,7 +122,7 @@ const Users = () => {
       full_name: user.full_name,
       email: user.email,
       password: "",
-      role: user.role_id,
+      role: user.role_name,
     });
     setIsModalOpen(true);
   };
@@ -191,12 +207,13 @@ const Users = () => {
                     <td className="px-6 py-6">
                       <span
                         className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-tighter ${
-                          u.role === "admin" || u.role === "super-admin"
+                          u.role_name === "admin" ||
+                          u.role_name === "superadmin"
                             ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400"
                             : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
                         }`}
                       >
-                        {u.role}
+                        {u.role_name}
                       </span>
                     </td>
                     <td className="px-6 py-6 text-right">
@@ -326,7 +343,6 @@ const Users = () => {
                   >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
-                    <option value="super-admin">Super Admin</option>
                   </select>
                 </div>
 

@@ -23,12 +23,26 @@ const Login = () => {
     try {
       const response = await api.post("/auth/login", { email, password });
       if (response.data?.accessToken && response.data?.user) {
-        login(response.data.user, response.data.accessToken);
-        setAuthToken(response.data.accessToken);
-        navigate("/dashboard", { replace: true });
+        const userRole = response.data.user.role;
+        if (userRole === "admin" || userRole === "superadmin") {
+          // Add role_name for consistency across the app
+          const userData = {
+            ...response.data.user,
+            role_name: response.data.user.role,
+          };
+          // Store access token in localStorage
+          localStorage.setItem("token", response.data.accessToken);
+          // Refresh token is already stored in HTTP-only cookie by backend
+          login(userData, response.data.accessToken);
+          setAuthToken(response.data.accessToken);
+          navigate("/dashboard", { replace: true });
+        } else {
+          setError("Access denied. Only admin and superadmin are allowed.");
+        }
       }
     } catch (err) {
-      const message = err.response?.data?.message || "Invalid email or password";
+      const message =
+        err.response?.data?.message || "Invalid email or password";
       setError(message);
     } finally {
       setIsLoading(false);
@@ -119,14 +133,21 @@ const Login = () => {
             disabled={isLoading}
             className="w-full py-5 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2 disabled:bg-emerald-400"
           >
-            {isLoading ? <Loader2 className="animate-spin" size={20} /> : "SIGN IN"}
+            {isLoading ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              "SIGN IN"
+            )}
           </button>
         </form>
 
         {/* Register Link */}
         <p className="mt-8 text-center text-slate-400 font-medium">
           New here?{" "}
-          <Link to="/register" className="text-emerald-600 dark:text-emerald-400 underline">
+          <Link
+            to="/register"
+            className="text-emerald-600 dark:text-emerald-400 underline"
+          >
             Join us
           </Link>
         </p>
