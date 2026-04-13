@@ -11,7 +11,7 @@ import {
   Sun,
   Moon,
   TrendingUp,
-  ShieldCheck,
+  // ShieldCheck,
 } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
@@ -33,13 +33,13 @@ const Sidebar = () => {
       name: "Admins",
       icon: <ShieldAlert size={20} />,
       path: "/admins",
-      superOnly: true,
     },
-    {
-      name: "Permissions",
-      icon: <ShieldCheck size={20} />,
-      path: "/admins/edit-rights/default",
-    },
+    // {
+    //   name: "Permissions",
+    //   icon: <ShieldCheck size={20} />,
+    //   path: "/admins/edit-rights/default",
+    //   superOnlyAccess: true,
+    // },
     { name: "Update Price", icon: <Tag size={20} />, path: "/update-price" },
     { name: "Nirkh Nama", icon: <Tag size={20} />, path: "/daily-prices" },
     { name: "Analytics", icon: <TrendingUp size={20} />, path: "/price-graph" },
@@ -59,21 +59,34 @@ const Sidebar = () => {
 
       <nav className="flex-1 px-4 space-y-2">
         {menuItems.map((item) => {
-          if (item.superOnly && user?.role !== "super-admin") return null;
+          const isSuperAdmin = user?.role_name === "superadmin";
+          const isRestricted = item.superOnlyAccess && !isSuperAdmin;
           const active = location.pathname === item.path;
+
           return (
-            <Link key={item.path} to={item.path}>
-              <motion.div
-                whileHover={{ x: 5 }}
-                whileTap={{ scale: 0.95 }}
-                className={`flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 ${active ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200 dark:shadow-none" : "text-slate-500 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/40"}`}
-              >
-                {item.icon}{" "}
-                <span className="font-semibold text-sm uppercase tracking-wider">
-                  {item.name}
-                </span>
-              </motion.div>
-            </Link>
+            <div key={item.path}>
+              {isRestricted ? (
+                <div className="flex items-center gap-4 p-4 rounded-2xl text-slate-300 dark:text-slate-600 cursor-not-allowed">
+                  {item.icon}
+                  <span className="font-semibold text-sm uppercase tracking-wider">
+                    {item.name}
+                  </span>
+                </div>
+              ) : (
+                <Link to={item.path}>
+                  <motion.div
+                    whileHover={{ x: 5 }}
+                    whileTap={{ scale: 0.95 }}
+                    className={`flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 ${active ? "bg-emerald-600 text-white shadow-lg shadow-emerald-200 dark:shadow-none" : "text-slate-500 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-900/40"}`}
+                  >
+                    {item.icon}{" "}
+                    <span className="font-semibold text-sm uppercase tracking-wider">
+                      {item.name}
+                    </span>
+                  </motion.div>
+                </Link>
+              )}
+            </div>
           );
         })}
       </nav>

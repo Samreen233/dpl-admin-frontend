@@ -25,7 +25,7 @@ import Admins from "./pages/Admins";
 import UpdatePrice from "./pages/UpdatePrice";
 import DailyPrices from "./pages/DailyPrices";
 import PriceGraph from "./pages/PriceGraph";
-import EditRights from "./pages/EditRights";
+// import EditRights from "./pages/EditRights";
 
 // Helper component to redirect logged-in users away from Auth pages (Login/Register)
 const PublicRoute = ({ children }) => {
@@ -40,7 +40,6 @@ function App() {
         <Routes>
           {/* Wrap everything inside AuthProvider as a layout route */}
           <Route element={<AuthProvider />}>
-            
             {/* -------- Public Routes (Redirect if already logged in) -------- */}
             <Route
               path="/"
@@ -68,7 +67,10 @@ function App() {
                 <Route path="/products" element={<Products />} />
                 <Route path="/users" element={<Users />} />
                 <Route path="/admins" element={<Admins />} />
-                <Route path="/admins/edit-rights/:id" element={<EditRights />} />
+                {/* <Route
+                  path="/admins/edit-rights/:id"
+                  element={<EditRights />}
+                /> */}
                 <Route path="/update-price" element={<UpdatePrice />} />
                 <Route path="/daily-prices" element={<DailyPrices />} />
                 <Route path="/price-graph" element={<PriceGraph />} />

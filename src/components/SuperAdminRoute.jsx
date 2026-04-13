@@ -2,17 +2,21 @@ import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const ProtectedRoute = () => {
+const SuperAdminRoute = () => {
   const { user } = useAuth();
-  const token = localStorage.getItem("token");
 
   // If not logged in, redirect to login
-  if (!user || !token) {
+  if (!user) {
     return <Navigate to="/" replace />;
+  }
+
+  // If not superadmin, redirect to dashboard
+  if (user.role_name !== "superadmin") {
+    return <Navigate to="/dashboard" replace />;
   }
 
   // Render nested routes
   return <Outlet />;
 };
 
-export default ProtectedRoute;
+export default SuperAdminRoute;
