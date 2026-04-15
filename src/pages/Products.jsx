@@ -24,6 +24,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  getProductsByDate,
 } from "../api/products";
 import api from "../api/axios";
 
@@ -42,6 +43,13 @@ const Products = () => {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [previousPrices, setPreviousPrices] = useState({});
+
+  // Date Filter State
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  });
+  const [previousDayProducts, setPreviousDayProducts] = useState({});
 
   // UI State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -121,18 +129,70 @@ const Products = () => {
     }
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (date = null) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getProducts();
+
+      const fetchDate = date || selectedDate;
+
+      // If no date selected, fetch all products
+      if (!fetchDate) {
+        const data = await getProducts();
+        setProducts(data);
+        setPreviousDayProducts({});
+        return;
+      }
+
+      // Fetch products for selected date
+      const data = await getProductsByDate(fetchDate);
       setProducts(data);
+
+      // Calculate previous day date
+      const currentDate = new Date(fetchDate);
+      const previousDate = new Date(currentDate);
+      previousDate.setDate(currentDate.getDate() - 1);
+      const previousDateStr = previousDate.toISOString().split("T")[0];
+
+      // Fetch previous day products
+      try {
+        const previousData = await getProductsByDate(previousDateStr);
+        const previousMap = {};
+        previousData.forEach((product) => {
+          previousMap[product.name] = product.price;
+        });
+        setPreviousDayProducts(previousMap);
+      } catch (err) {
+        console.error("Failed to fetch previous day products:", err);
+        setPreviousDayProducts({});
+      }
     } catch (err) {
       console.error("Failed to fetch products:", err);
       setError("Failed to load products. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value);
+  };
+
+  const handleApplyDateFilter = () => {
+    fetchProducts(selectedDate);
+  };
+
+  const handleShowAllProducts = () => {
+    // Reset to show all products without date filter
+    setSelectedDate("");
+    getProducts()
+      .then((data) => {
+        setProducts(data);
+        setPreviousDayProducts({});
+      })
+      .catch((err) => {
+        console.error("Failed to fetch all products:", err);
+      });
   };
 
   const handleFileChange = (e, isEditing = false) => {
@@ -279,14 +339,38 @@ const Products = () => {
           </p>
         </div>
 
-        <Motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-emerald-500/20 hover:bg-emerald-500 transition-all"
-        >
-          <Plus size={20} /> ADD NEW PRODUCT
-        </Motion.button>
+        <div className="flex flex-col sm:flex-row gap-3 items-center">
+          {/* Date Filter */}
+          <div className="flex items-center gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-emerald-50 dark:border-slate-800">
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="px-3 py-2 bg-slate-50 dark:bg-slate-800 border-none outline-none rounded-xl text-sm font-medium dark:text-white"
+            />
+            <button
+              onClick={handleApplyDateFilter}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-black hover:bg-emerald-500 transition-all"
+            >
+              Apply
+            </button>
+            <button
+              onClick={handleShowAllProducts}
+              className="px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-white rounded-xl text-sm font-black hover:bg-slate-300 dark:hover:bg-slate-600 transition-all"
+            >
+              Show All
+            </button>
+          </div>
+
+          <Motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-emerald-500/20 hover:bg-emerald-500 transition-all"
+          >
+            <Plus size={20} /> ADD NEW PRODUCT
+          </Motion.button>
+        </div>
       </div>
 
       {/* Grid Section */}
@@ -403,7 +487,25 @@ const Products = () => {
 
                     <div className="mt-6 flex items-end justify-between border-t border-slate-50 dark:border-slate-800 pt-4">
                       <div>
-                        {previousPrices[p.product_id] ? (
+                        {previousDayProducts[p.name] ? (
+                          <div className="flex flex-col">
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                              Previous Day
+                            </span>
+                            <span className="text-slate-400 line-through text-[10px] font-bold italic">
+                              Rs.{previousDayProducts[p.name]}
+                            </span>
+                            <span className="text-[10px] font-bold text-emerald-600 mt-1">
+                              Current Day
+                            </span>
+                            <span className="text-2xl font-black text-emerald-600 font-mono">
+                              Rs.{p.price}
+                              <span className="text-xs ml-1 opacity-60">
+                                /kg
+                              </span>
+                            </span>
+                          </div>
+                        ) : previousPrices[p.product_id] ? (
                           <div className="flex flex-col">
                             <span className="text-slate-400 line-through text-[10px] font-bold italic">
                               Rs.{previousPrices[p.product_id]}

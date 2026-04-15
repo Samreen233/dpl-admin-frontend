@@ -40,7 +40,7 @@ const Sidebar = () => {
     //   path: "/admins/edit-rights/default",
     //   superOnlyAccess: true,
     // },
-    { name: "Update Price", icon: <Tag size={20} />, path: "/update-price" },
+    // { name: "Update Price", icon: <Tag size={20} />, path: "/update-price" },
     { name: "Nirkh Nama", icon: <Tag size={20} />, path: "/daily-prices" },
     { name: "Analytics", icon: <TrendingUp size={20} />, path: "/price-graph" },
   ];

@@ -105,7 +105,10 @@ export const updateProduct = async (id, productData, imageFile = null) => {
   if (productData.price !== undefined)
     jsonData.price = normalizeNumber(productData.price);
   if (productData.discount_percent !== undefined)
-    jsonData.discount_percent = normalizeNumber(productData.discount_percent, 0);
+    jsonData.discount_percent = normalizeNumber(
+      productData.discount_percent,
+      0,
+    );
   if (productData.stock_qty !== undefined)
     jsonData.stock_qty = normalizeNumber(productData.stock_qty, 0);
   if (
@@ -124,6 +127,16 @@ export const updateProduct = async (id, productData, imageFile = null) => {
 // Delete a product (soft delete)
 export const deleteProduct = async (id) => {
   const response = await api.delete(`${PRODUCTS_URL}/${id}`);
+  return response.data;
+};
+
+// Fetch products by date
+export const getProductsByDate = async (date) => {
+  const params = {};
+  if (date) {
+    params.date = date;
+  }
+  const response = await api.get(`${PRODUCTS_URL}/date`, { params });
   return response.data;
 };
 
