@@ -24,6 +24,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  updateProductPrice,
   getProductsByDate,
 } from "../api/products";
 import api from "../api/axios";
@@ -308,9 +309,21 @@ const Products = () => {
             : Number(editingProduct.category_id),
       };
 
+      // 🔥 Step 1: Update price/stock/discount using new API
+      await updateProductPrice(editingProduct.product_id, {
+        price: editingProduct.price,
+        discount_percent: editingProduct.discount_percent,
+        stock_qty: editingProduct.stock_qty,
+      });
+
+      // 🔥 Step 2: Update other fields (only if needed)
       await updateProduct(
         editingProduct.product_id,
-        productData,
+        {
+          name: editingProduct.name,
+          description: editingProduct.description,
+          category_id: editingProduct.category_id,
+        },
         editingProduct.imageFile,
       );
       await fetchProducts(); // Refresh product list
@@ -764,7 +777,6 @@ const Products = () => {
                     type="number"
                     step="0.01"
                     min="0"
-                    max="100"
                     value={
                       editingProduct
                         ? editingProduct.discount_percent

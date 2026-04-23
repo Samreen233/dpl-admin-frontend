@@ -22,9 +22,9 @@ import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import Users from "./pages/Users";
 import Admins from "./pages/Admins";
-import UpdatePrice from "./pages/UpdatePrice";
+// import UpdatePrice from "./pages/UpdatePrice";
 import DailyPrices from "./pages/DailyPrices";
-import PriceGraph from "./pages/PriceGraph";
+// import PriceGraph from "./pages/PriceGraph";
 // import EditRights from "./pages/EditRights";
 
 // Helper component to redirect logged-in users away from Auth pages (Login/Register)
@@ -71,9 +71,9 @@ function App() {
                   path="/admins/edit-rights/:id"
                   element={<EditRights />}
                 /> */}
-                <Route path="/update-price" element={<UpdatePrice />} />
+                {/* <Route path="/update-price" element={<UpdatePrice />} /> */}
                 <Route path="/daily-prices" element={<DailyPrices />} />
-                <Route path="/price-graph" element={<PriceGraph />} />
+                {/* <Route path="/price-graph" element={<PriceGraph />} /> */}
               </Route>
             </Route>
 

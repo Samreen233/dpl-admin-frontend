@@ -4,229 +4,214 @@ const PriceList = () => {
   const componentRef = useRef();
   const [currentDate, setCurrentDate] = useState("");
 
-  // Initialize with empty prices for manual entry
   const [leftColumn, setLeftColumn] = useState([
-    { id: 24, name: "پھول گوبھی", first: "", second: "" },
-    { id: 25, name: "بند گوبھی", first: "", second: "" },
-    { id: 26, name: "مٹر (پنجاب)", first: "", second: "" },
-    { id: 27, name: "مٹر (لوکل)", first: "", second: "" },
-    { id: 32, name: "ٹینڈا (فارم)", first: "", second: "" },
-    { id: 33, name: "ٹینڈا (دیسی)", first: "", second: "" },
-    { id: 35, name: "شلجم (لوکل)", first: "", second: "" },
-    { id: 36, name: "گاجر", first: "", second: "" },
-    { id: 39, name: "فرانس بین", first: "", second: "" },
+    { id: 1, name: "پھول گوبھی", first: "", second: "" },
+    { id: 2, name: "بند گوبھی", first: "", second: "" },
+    { id: 3, name: "مٹر (پنجاب)", first: "", second: "" },
+    { id: 4, name: "مٹر (لوکل)", first: "", second: "" },
+    { id: 5, name: "ٹینڈا (فارم)", first: "", second: "" },
+    { id: 6, name: "ٹینڈا (دیسی)", first: "", second: "" },
+    { id: 7, name: "شلجم (لوکل)", first: "", second: "" },
+    { id: 8, name: "گاجر", first: "", second: "" },
+    { id: 9, name: "فرانس بین", first: "", second: "" },
+    { id: 10, name: "آلو سفید نیا", first: "", second: "" },
+    { id: 11, name: "آلو سرخ نیا", first: "", second: "" },
+    { id: 12, name: "پیاز", first: "", second: "" },
+    { id: 13, name: "ٹماٹر (ملکی)", first: "", second: "" },
+    { id: 14, name: "کچالو (سوات)", first: "", second: "" },
+    { id: 15, name: "کچالو (ادھوری)", first: "", second: "" },
+    { id: 16, name: "سبز مرچ", first: "", second: "" },
+    { id: 17, name: "شملہ مرچ", first: "", second: "" },
+    { id: 18, name: "لیموں (چائنہ)", first: "", second: "" },
+    { id: 19, name: "بینگن (گول)", first: "", second: "" },
+    { id: 20, name: "بینگن (لمبا)", first: "", second: "" },
   ]);
 
   const [rightColumn, setRightColumn] = useState([
-    { id: 2, name: "آلو سفید نیا", first: "", second: "" },
-    { id: 3, name: "آلو سرخ نیا", first: "", second: "" },
-    { id: 5, name: "پیاز", first: "", second: "" },
-    { id: 9, name: "ٹماٹر (ملکی)", first: "", second: "" },
-    { id: 10, name: "کچالو (سوات)", first: "", second: "" },
-    { id: 11, name: "کچالو (ادھوری)", first: "", second: "" },
-    { id: 12, name: "سبز مرچ", first: "", second: "" },
-    { id: 13, name: "شملہ مرچ", first: "", second: "" },
-    { id: 15, name: "لیموں (چائنہ)", first: "", second: "" },
-    { id: 16, name: "بینگن (گول)", first: "", second: "" },
-    { id: 17, name: "بینگن (لمبا)", first: "", second: "" },
-    { id: 18, name: "کھیرا", first: "", second: "" },
-    { id: 19, name: "لہسن (پاک)", first: "", second: "" },
-    { id: 20, name: "لہسن (چائنہ)", first: "", second: "" },
-    { id: 22, name: "ادرک (تھائی لینڈ)", first: "", second: "" },
-    { id: 23, name: "کدو", first: "", second: "" },
+    { id: 21, name: "کھیرا", first: "", second: "" },
+    { id: 22, name: "لہسن (پاک)", first: "", second: "" },
+    { id: 23, name: "لہسن (چائنہ)", first: "", second: "" },
+    { id: 24, name: "ادرک (تھائی لینڈ)", first: "", second: "" },
+    { id: 25, name: "ادرک (پاکستان)", first: "", second: "" },
+    { id: 26, name: "ہری مرچ", first: "", second: "" },
+    { id: 27, name: "ہری مرچ (چائنہ)", first: "", second: "" },
+    { id: 28, name: "ہری مرچ (تھائی لینڈ)", first: "", second: "" },
+    { id: 29, name: "ہری مرچ (دیسی)", first: "", second: "" },
+    { id: 30, name: "ہری مرچ (بنگلہ دیش)", first: "", second: "" },
+    { id: 31, name: "ہری مرچ (بھارت)", first: "", second: "" },
+    { id: 32, name: "ہری مرچ (ایران)", first: "", second: "" },
+    { id: 33, name: "ہری مرچ (ترکی)", first: "", second: "" },
+    { id: 34, name: "ہری مرچ (سعودی عرب)", first: "", second: "" },
+    { id: 35, name: "ہری مرچ (متفرق)", first: "", second: "" },
+    { id: 36, name: "ہری مرچ (دیگر)", first: "", second: "" },
+    { id: 37, name: "ہری مرچ (بنگلہ دیش)", first: "", second: "" },
+    { id: 38, name: "ہری مرچ (ترکی)", first: "", second: "" },
+    { id: 39, name: "ہری مرچ (بنگلہ دیش)", first: "", second: "" },
+    { id: 40, name: "ہری مرچ (بنگلہ دیش)", first: "", second: "" },
   ]);
 
-  // Get current date automatically on component mount
   useEffect(() => {
     const today = new Date();
-    const day = String(today.getDate()).padStart(2, "0");
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    setCurrentDate(`${day}/${month}`);
+    setCurrentDate(`${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`);
   }, []);
 
   const handlePrint = () => {
-    const printContents = componentRef.current.innerHTML;
+    const content = componentRef.current;
     const printWindow = window.open("", "_blank");
+    const styles = Array.from(document.styleSheets)
+      .map((styleSheet) => {
+        try {
+          return Array.from(styleSheet.cssRules).map((rule) => rule.cssText).join("");
+        } catch (e) { return ""; }
+      })
+      .join("");
+
     printWindow.document.write(`
       <html dir="rtl">
         <head>
-          <title>Price List ${currentDate}</title>
+          <title>Price List - Charsadda</title>
           <style>
-            @page { size: A4; margin: 10mm; }
-            body { margin: 0; padding: 0; font-family: serif; }
-            table { border-collapse: collapse; width: 100%; }
-            th, td { border: 1px solid black; padding: 4px; }
-            input { border: none; background: transparent; text-align: center; font-weight: bold; width: 100%; }
-            .no-print { display: none !important; }
+            ${styles} 
+            @media print {
+              @page { size: A4; margin: 4mm; }
+              body { -webkit-print-color-adjust: exact; margin: 0; }
+              .no-print { display: none !important; }
+            }
+            body { font-family: 'Noto Nastaliq Urdu', serif; padding: 10px; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1.2px solid black !important; line-height: 1; }
           </style>
         </head>
-        <body>${printContents}</body>
+        <body>
+          <div class="print-container">
+            ${content.innerHTML}
+          </div>
+          <script>
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+              const span = document.createElement('span');
+              span.textContent = input.value;
+              span.style.fontWeight = 'bold';
+              span.style.color = '#1e40af';
+              input.parentNode.replaceChild(span, input);
+            });
+            window.onload = () => {
+              setTimeout(() => { window.print(); window.close(); }, 250);
+            };
+          </script>
+        </body>
       </html>
     `);
     printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 500);
   };
 
-  // Update price handlers
   const updatePrice = (column, index, field, value) => {
-    if (column === "left") {
-      setLeftColumn((prev) => {
-        const updated = [...prev];
-        updated[index] = { ...updated[index], [field]: value };
-        return updated;
-      });
-    } else {
-      setRightColumn((prev) => {
-        const updated = [...prev];
-        updated[index] = { ...updated[index], [field]: value };
-        return updated;
-      });
-    }
+    const setter = column === "left" ? setLeftColumn : setRightColumn;
+    setter((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
   };
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen flex flex-col items-center">
-      <div className="flex gap-4 mb-4">
-        <button
-          onClick={handlePrint}
-          className="px-6 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition font-bold"
-        >
-          Print / Save as PDF
+    <div className="p-4 bg-gray-200 min-h-screen flex flex-col items-center no-print">
+      <div className="flex gap-4 mb-4 no-print">
+        <button onClick={handlePrint} className="px-6 py-2 bg-emerald-700 text-white rounded shadow hover:bg-emerald-800 font-bold">
+          Print / Save PDF
         </button>
-        <button
-          onClick={() => {
-            setLeftColumn((prev) =>
-              prev.map((item) => ({ ...item, first: "", second: "" })),
-            );
-            setRightColumn((prev) =>
-              prev.map((item) => ({ ...item, first: "", second: "" })),
-            );
-          }}
-          className="px-6 py-2 bg-gray-600 text-white rounded shadow hover:bg-gray-700 transition font-bold"
-        >
-          Clear All
+        <button onClick={() => window.location.reload()} className="px-6 py-2 bg-red-600 text-white rounded shadow hover:bg-red-700 font-bold">
+          Reset
         </button>
       </div>
 
-      {/* Printable Area */}
       <div
         ref={componentRef}
-        className="w-[210mm] min-h-[297mm] bg-white p-4 border-[3px] border-emerald-800 shadow-lg relative font-serif"
+        className="w-[210mm] bg-white p-4 border-[3px] border-emerald-900 shadow-2xl relative"
         dir="rtl"
       >
-        {/* Header Section */}
-        <div className="flex justify-between items-start mb-4 border-b-2 border-emerald-800 pb-2">
-          <div className="text-left text-lg font-bold">
-            مورخہ: {currentDate}
-          </div>
+        {/* Header - Thoda compact kiya */}
+        <div className="flex justify-between items-center mb-2 border-b-2 border-emerald-900 pb-2">
+          <div className="text-lg font-bold text-black">مورخہ: {currentDate}</div>
           <div className="text-center flex-1">
-            <h1 className="text-2xl font-bold text-emerald-900">
+            <h1 className="text-2xl font-black text-emerald-900 mb-0">
               نرخنامہ برائے فریش سبزی محکمہ خوراک ضلع چارسدہ
             </h1>
-            <div className="flex justify-center gap-8 mt-2 text-sm font-semibold">
+            <div className="flex justify-center gap-8 text-xs font-bold text-gray-800">
               <span>ڈپٹی کمشنر: 9220024-091</span>
               <span>ڈی ایف او: 9220116-091</span>
             </div>
           </div>
-          <div className="w-24 h-24 border border-dashed border-gray-400 flex items-center justify-center text-xs">
-            [Logo Image]
+          <div className="w-16 h-16 border border-emerald-900 flex items-center justify-center font-bold text-[10px] text-center">
+            GOVT LOGO
           </div>
         </div>
 
-        {/* Tables Container */}
-        <div className="flex gap-0 border-t border-black">
-          {/* Left Table Section */}
-          <EditableTable
-            data={leftColumn}
-            onUpdate={(index, field, value) =>
-              updatePrice("left", index, field, value)
-            }
-          />
-          {/* Right Table Section */}
-          <EditableTable
-            data={rightColumn}
-            onUpdate={(index, field, value) =>
-              updatePrice("right", index, field, value)
-            }
-          />
+        {/* Tables */}
+        <div className="flex">
+          <EditableTable data={leftColumn} onUpdate={(i, f, v) => updatePrice("left", i, f, v)} />
+          <EditableTable data={rightColumn} onUpdate={(i, f, v) => updatePrice("right", i, f, v)} />
         </div>
 
-        {/* Footer Section */}
-        <div className="mt-8 grid grid-cols-3 text-center text-xs font-bold gap-4">
-          <div className="border-t border-black pt-2">
-            District Administration <br /> Charsadda
+        {/* Footer - Space kam ki */}
+        <div className="mt-4 grid grid-cols-3 text-center items-end text-[10px]">
+          <div className="font-bold">
+            <div className="border-t border-black pt-1 mx-2">District Administration Charsadda</div>
           </div>
           <div className="flex flex-col items-center">
-            <div className="w-16 h-16 border rounded-full border-blue-500 flex items-center justify-center text-[8px] text-blue-500 mb-1">
+            <div className="w-12 h-12 border border-blue-800 rounded-full flex items-center justify-center text-[7px] text-blue-800 font-bold mb-1">
               Official Seal
             </div>
-            <span>District Food Controller Charsadda</span>
+            <span className="font-bold">District Food Controller Charsadda</span>
           </div>
-          <div className="border-t border-black pt-2">TMA سبزی منڈی چارسدہ</div>
+          <div className="font-bold">
+            <div className="border-t border-black pt-1 mx-2 text-sm">TMA سبزی منڈی چارسدہ</div>
+          </div>
         </div>
 
-        {/* Contact Info */}
-        <div className="mt-4 text-[10px] text-right leading-tight">
-          <p>کسی بھی شکایت کی صورت میں مندرجہ ذیل نمبروں پر رابطہ کریں:</p>
-          <p>
-            AC Tangi: 091-6555206 | AC Shabqadar: 091-6289477 | AC Charsadda:
-            091-9220137
-          </p>
+        <div className="mt-2 text-[9px] font-bold text-right border-t border-gray-300 pt-1">
+          <p>کسی بھی شکایت کی صورت میں ان نمبروں پر رابطہ کریں: AC Tangi: 091-6555206 | AC Shabqadar: 091-6289477 | AC Charsadda: 091-9220137</p>
         </div>
       </div>
     </div>
   );
 };
 
-// Editable Table Component with input fields
 const EditableTable = ({ data, onUpdate }) => (
-  <table className="w-1/2 border-collapse border border-black text-sm">
+  <table className="w-1/2 table-fixed border-collapse">
     <thead>
-      <tr className="bg-emerald-50">
-        <th className="border border-black p-1 w-12">نمبر شمار</th>
-        <th className="border border-black p-1">نام سبزی</th>
-        <th className="border border-black p-1 w-20 text-[10px]">
-          درجہ اول فی کلو
-        </th>
-        <th className="border border-black p-1 w-20 text-[10px]">
-          درجہ دوم فی کلو
-        </th>
+      <tr className="bg-emerald-100 h-10">
+        <th className="border-2 border-black w-[12%] text-xs">نمبر</th>
+        <th className="border-2 border-black w-[48%] text-base">نام سبزی</th>
+        <th className="border-2 border-black w-[20%] text-[10px] leading-tight">درجہ اول</th>
+        <th className="border-2 border-black w-[20%] text-[10px] leading-tight">درجہ دوم</th>
       </tr>
     </thead>
     <tbody>
-      {[...Array(23)].map((_, i) => {
-        const item = data[i] || {};
-        return (
-          <tr key={i} className="h-7">
-            <td className="border border-black text-center">{item.id || ""}</td>
-            <td className="border border-black px-2 text-right font-semibold">
-              {item.name || ""}
-            </td>
-            <td className="border border-black text-center p-0">
-              <input
-                type="text"
-                value={item.first || ""}
-                onChange={(e) => onUpdate(i, "first", e.target.value)}
-                className="w-full h-full text-center font-bold text-blue-800 bg-transparent border-none focus:outline-none focus:bg-yellow-100"
-                placeholder=""
-              />
-            </td>
-            <td className="border border-black text-center p-0">
-              <input
-                type="text"
-                value={item.second || ""}
-                onChange={(e) => onUpdate(i, "second", e.target.value)}
-                className="w-full h-full text-center font-bold text-blue-800 bg-transparent border-none focus:outline-none focus:bg-yellow-100"
-                placeholder=""
-              />
-            </td>
-          </tr>
-        );
-      })}
+      {data.map((item, i) => (
+        <tr key={i} className="h-[28px]"> {/* Fixed compact height */}
+          <td className="border-2 border-black text-center font-bold text-xs">{item.id}</td>
+          <td className="border-2 border-black px-1 text-right font-bold text-sm overflow-hidden whitespace-nowrap">
+            {item.name}
+          </td>
+          <td className="border-2 border-black p-0">
+            <input
+              type="text"
+              value={item.first}
+              onChange={(e) => onUpdate(i, "first", e.target.value)}
+              className="w-full h-full text-center font-bold text-blue-800 bg-transparent outline-none text-sm"
+            />
+          </td>
+          <td className="border-2 border-black p-0">
+            <input
+              type="text"
+              value={item.second}
+              onChange={(e) => onUpdate(i, "second", e.target.value)}
+              className="w-full h-full text-center font-bold text-blue-800 bg-transparent outline-none text-sm"
+            />
+          </td>
+        </tr>
+      ))}
     </tbody>
   </table>
 );

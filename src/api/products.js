@@ -1,6 +1,6 @@
 import api from "./axios";
 
-const PRODUCTS_URL = import.meta.env.VITE_PRODUCTS_URL || "/products";
+const PRODUCTS_URL = "/products";
 const normalizeNumber = (value, fallback = 0) => {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : fallback;
@@ -140,11 +140,12 @@ export const getProductsByDate = async (date) => {
   return response.data;
 };
 
-// Bulk update prices for multiple products
-export const updatePrices = async (priceUpdates) => {
-  // priceUpdates should be an array of: { id, price, rate_g1?, rate_g2? }
-  const response = await api.post(`${PRODUCTS_URL}/update-prices`, {
-    prices: priceUpdates,
+/// ✅ Update single product price
+export const updateProductPrice = async (id, priceData) => {
+  const response = await api.post(`${PRODUCTS_URL}/update-price/${id}`, {
+    price: Number(priceData.price),
+    discount_percent: Number(priceData.discount_percent || 0),
+    stock_qty: Number(priceData.stock_qty || 0),
   });
   return response.data;
 };
